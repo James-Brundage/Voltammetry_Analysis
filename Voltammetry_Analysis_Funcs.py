@@ -165,6 +165,20 @@ def multiple_file_sort_norm (dir):
     pd.DataFrame.to_clipboard(pd.concat(norm_df_lst,axis=0))
     return pd.concat(norm_df_lst,axis=0)
 
+'''The following functions will be used to help in the psychostimulatns project'''
+
+# Reads in the brn files (aka weird txt files Jordan named after me)
+def read_txt_JYorg (path,plot=False):
+
+    kinetics_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False)
+    time_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False, skiprows=2).transpose()
+    time_df.columns = ['Time (s)','Current (nA)']
+    if plot == True:
+        df = time_df
+        sns.lineplot('Time (s)', 'Current (nA)', data=time_df)
+        plt.show()
+    return [kinetics_df,time_df]
+
 
 
 
