@@ -167,7 +167,7 @@ def multiple_file_sort_norm (dir):
 
 '''The following functions will be used to help in the psychostimulatns project'''
 
-# Reads in the brn files (aka weird txt files Jordan named after me)
+# Reads in the txt files strucured like brns files (aka weird txt files Jordan named after me)
 def read_txt_JYorg (path,plot=False):
 
     kinetics_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False)
@@ -179,7 +179,47 @@ def read_txt_JYorg (path,plot=False):
         plt.show()
     return [kinetics_df,time_df]
 
+# Actually reads the brns
+def read_brn_JYorg (path,plot=False,dir=False):
 
+    if dir == False:
+
+        first_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False)
+        kinetics_df = first_df.loc[0:1]
+
+        time_df = first_df.iloc[2:,0:2]
+        time_df.columns = ['Time (s)','Current (nA)']
+        time_df.reset_index()
+        time_df.drop(2,0,inplace=True)
+
+        if plot == True:
+
+            time_df['Time (s)'] = time_df['Time (s)'].astype(float)
+            time_df['Current (nA)'] = time_df['Current (nA)'].astype(float)
+            sns.lineplot('Time (s)', 'Current (nA)', data=time_df)
+            plt.show()
+        return [kinetics_df,time_df]
+
+    else:
+
+        sub = dir + "\\"
+        dire = os.listdir(dir)
+
+        for file in dire:
+            pathb = (sub + file)
+
+            first_df = pd.read_csv(pathb, sep='\t', engine='python', header=None, error_bad_lines=False)
+            kinetics_df = first_df.loc[0:1]
+
+            time_df = first_df.iloc[2:, 0:2]
+            time_df.columns = ['Time (s)', 'Current (nA)']
+
+            if plot == True:
+                time_df['Time (s)'] = time_df['Time (s)'].astype(float)
+                time_df['Current (nA)'] = time_df['Current (nA)'].astype(float)
+                sns.lineplot('Time (s)', 'Current (nA)', data=time_df)
+                plt.show()
+            return [kinetics_df, time_df]
 
 
 
