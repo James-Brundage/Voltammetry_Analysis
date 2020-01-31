@@ -168,21 +168,9 @@ def multiple_file_sort_norm (dir):
 '''The following functions will be used to help in the psychostimulatns project'''
 
 # Reads in the txt files strucured like brns files (aka weird txt files Jordan named after me)
-def read_txt_JYorg (path,plot=False):
+def read_brn_JYorg (path,plot=False,dr=False):
 
-    kinetics_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False)
-    time_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False, skiprows=2).transpose()
-    time_df.columns = ['Time (s)','Current (nA)']
-    if plot == True:
-        df = time_df
-        sns.lineplot('Time (s)', 'Current (nA)', data=time_df)
-        plt.show()
-    return [kinetics_df,time_df]
-
-# Actually reads the brns
-def read_brn_JYorg (path,plot=False,dir=False):
-
-    if dir == False:
+    if dr == False:
 
         first_df = pd.read_csv(path, sep='\t', engine='python', header=None, error_bad_lines=False)
         kinetics_df = first_df.loc[0:1]
@@ -202,25 +190,44 @@ def read_brn_JYorg (path,plot=False,dir=False):
 
     else:
 
-        sub = dir + "\\"
-        dire = os.listdir(dir)
+        sub = path + "\\"
+        lst_dir = os.listdir(path)
 
+        dire = []
+        for file in lst_dir:
+            if file.find('brn') > -1:
+                dire.append(file)
+
+        kin_df_lst = []
+        time_df_lst = []
         for file in dire:
             pathb = (sub + file)
 
             first_df = pd.read_csv(pathb, sep='\t', engine='python', header=None, error_bad_lines=False)
-            kinetics_df = first_df.loc[0:1]
+            kinetics_df = first_df.loc[0:1].copy()
+            kinetics_df.columns = kinetics_df.iloc[0]
+            kinetics_df.drop(0,axis=0,inplace=True)
+            kinetics_df['Relational'] = ['file code'] * len(kinetics_df)
 
             time_df = first_df.iloc[2:, 0:2]
             time_df.columns = ['Time (s)', 'Current (nA)']
+            time_df['File Name'] = [file] * len(time_df)
+            time_df.reset_index()
+            time_df.drop(2, 0, inplace=True)
 
             if plot == True:
                 time_df['Time (s)'] = time_df['Time (s)'].astype(float)
                 time_df['Current (nA)'] = time_df['Current (nA)'].astype(float)
                 sns.lineplot('Time (s)', 'Current (nA)', data=time_df)
                 plt.show()
-            return [kinetics_df, time_df]
 
+            kin_df_lst.append(kinetics_df)
+            time_df_lst.append(time_df)
+
+        kin_df_con = pd.concat(kin_df_lst,axis=0)
+        time_df_con = pd.concat(time_df_lst,axis=0)
+
+        return [kin_df_con,time_df_con]
 
 
 
