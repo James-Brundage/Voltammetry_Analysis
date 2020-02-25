@@ -230,7 +230,42 @@ def read_brn_JYorg (path,plot=False,dr=False):
         return [kin_df_con,time_df_con]
 
 
+def add_drug_conc (path):
 
+    flatten = lambda l: [item for sublist in l for item in sublist]
+    df = pd.read_csv(path)
+    print(df['File Name'])
+
+    n = int(input('How many drugs are there, including control? '))
+
+    name_lst = df['File Name']
+
+    final_lst_names = []
+    final_lst_conc = []
+    for i in range(n):
+        code = input('What is the code? ')
+        name = input('What is the name? ')
+        conc = input('What is the concentration? ')
+
+        names_lst = []
+        conc_lst = []
+        for file in name_lst:
+
+            if file.find(code) > -1:
+                names_lst.append(name)
+                conc_lst.append(conc)
+
+        final_lst_names.append(names_lst)
+        final_lst_conc.append(conc_lst)
+
+    final_lst_names = flatten(final_lst_names)
+    final_lst_conc = flatten(final_lst_conc)
+
+    df['Drug Applied'] = final_lst_names
+    df['Drug Concentration'] = final_lst_conc
+
+    print(df)
+    return df
 
 
 
